@@ -34,10 +34,11 @@ function applyTextIntent(text) {
   const intent = text.toLowerCase();
   const solo = /\b(solo|alone|my own|by myself)\b|一个人|独处/.test(intent);
   const social = /\b(social|friends|people|together)\b|朋友|聚会|社交/.test(intent);
+  const littleBuzz = /\b(little|some|a bit of) buzz\b|有点热闹/.test(intent);
   const buzzing = /\b(buzz|buzzing|loud|dance|energetic)\b|热闹|兴奋|跳舞/.test(intent);
   const chill = /\b(chill|quiet|calm|peaceful|relax)\b|安静|放松|平静/.test(intent);
   if (solo !== social) state.x = solo ? 0.24 : 0.76;
-  if (buzzing !== chill) state.y = buzzing ? 0.27 : 0.75;
+  if (buzzing !== chill) state.y = buzzing ? (littleBuzz ? 0.46 : 0.27) : 0.75;
   renderPosition();
 }
 

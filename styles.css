@@ -101,7 +101,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .loading-message { margin-bottom: 6px; }
 .intro-message { max-width: 282px; padding-block: 8px; }
-.choice-message { max-width: 296px; padding-block: 8px 10px; }
+.choice-message { max-width: 296px; padding-block: 8px 10px; font-size: 14px; }
 .choice-message mark { background: #e5ff55; color: inherit; }
 .choice-answer { margin-top: 15px; padding: 7px 14px 8px; white-space: nowrap; }
 .instruction-message { max-width: 287px; margin-top: 15px; padding-block: 9px 10px; }
@@ -240,7 +240,7 @@ button { -webkit-tap-highlight-color: transparent; }
   position: absolute;
   z-index: 2;
   color: white;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: -.055em;
   line-height: 1;
