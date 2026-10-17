@@ -5,7 +5,6 @@ const composer = document.getElementById('composer');
 const promptField = document.getElementById('prompt');
 const thread = document.getElementById('thread');
 const categories = document.getElementById('categories');
-let activePrompt = document.getElementById('active-prompt');
 
 const lenses = {
   vibe: { name: 'your vibe', subject: 'tonight' },
@@ -19,24 +18,23 @@ const lenses = {
 
 const state = { x: 0.24, y: 0.46, category: 'vibe' };
 let draggingPointer = null;
-let hasInteractedWithMap = false;
-let lastPromptZone = '';
+let lastDraftZone = '';
 
-const zonePrompts = [
+const zoneDrafts = [
   [
-    'a lively place where you can still do your own thing?',
-    'somewhere lively, with company optional?',
-    'a lively place to be around people?',
+    'somewhere buzzing where i can still do my own thing',
+    'somewhere buzzing with people around, no pressure to mingle',
+    'somewhere buzzing to meet and talk with people',
   ],
   [
-    'a little buzz, but room to keep to yourself?',
-    'a little buzz, and room to see where the night goes?',
-    'a social spot with some energy, but not too much?',
+    'somewhere with a little buzz i can enjoy on my own',
+    'somewhere with a little buzz and room to see where the night goes',
+    'somewhere social with a little buzz',
   ],
   [
-    'somewhere quiet to recharge on your own?',
-    'a relaxed place with company optional?',
-    'a low-key place to catch up with people?',
+    'somewhere quiet to recharge on my own',
+    'somewhere relaxed with company optional',
+    'somewhere low-key to catch up with people',
   ],
 ];
 
@@ -68,33 +66,30 @@ function renderPosition() {
   map.style.setProperty('--y', `${state.y * 100}%`);
   description.textContent = describeVibe();
   handle.setAttribute('aria-label', `Vibe position: ${Math.round(state.x * 100)} percent toward social, ${Math.round((1 - state.y) * 100)} percent toward buzzing. ${description.textContent}`);
-  if (hasInteractedWithMap) updatePrompt();
 }
 
-function updatePrompt() {
+function updateDraft(force = false) {
   const column = state.x < 0.35 ? 0 : state.x > 0.65 ? 2 : 1;
   const row = state.y < 0.35 ? 0 : state.y > 0.65 ? 2 : 1;
   const zone = `${state.category}:${row}:${column}`;
-  if (zone === lastPromptZone) return;
-  lastPromptZone = zone;
-  const question = zonePrompts[row][column];
-  activePrompt.textContent = state.category === 'vibe'
-    ? question
-    : `for ${lenses[state.category].subject}, ${question}`;
+  if (!force && zone === lastDraftZone) return;
+  lastDraftZone = zone;
+  const draft = zoneDrafts[row][column];
+  promptField.value = state.category === 'vibe'
+    ? draft
+    : `for ${lenses[state.category].subject}: ${draft}`;
+  resizeComposer();
 }
 
-function setPositionFromPointer(event) {
+function setPositionFromPointer(event, forceDraft = false) {
   const rect = map.getBoundingClientRect();
   const radius = handle.offsetWidth / 2;
   const x = clamp(event.clientX - rect.left, radius, rect.width - radius);
   const y = clamp(event.clientY - rect.top, radius, rect.height - radius);
   state.x = x / rect.width;
   state.y = y / rect.height;
-  if (!hasInteractedWithMap) {
-    hasInteractedWithMap = true;
-    thread.scrollTop = thread.scrollHeight;
-  }
   renderPosition();
+  updateDraft(forceDraft);
 }
 
 map.addEventListener('pointerdown', (event) => {
@@ -102,7 +97,7 @@ map.addEventListener('pointerdown', (event) => {
   draggingPointer = event.pointerId;
   map.setPointerCapture(event.pointerId);
   map.classList.add('is-dragging');
-  setPositionFromPointer(event);
+  setPositionFromPointer(event, true);
   event.preventDefault();
 });
 
@@ -130,15 +125,14 @@ handle.addEventListener('keydown', (event) => {
   else if (event.key === 'ArrowDown') state.y = clamp(state.y + delta, 0.09, 0.91);
   else return;
   event.preventDefault();
-  hasInteractedWithMap = true;
   renderPosition();
+  updateDraft();
 });
 
 categories.addEventListener('click', (event) => {
   const selected = event.target.closest('[data-category]');
   if (!selected) return;
   state.category = selected.dataset.category;
-  hasInteractedWithMap = true;
   for (const tab of categories.querySelectorAll('[data-category]')) {
     const active = tab === selected;
     tab.classList.toggle('category--active', active);
@@ -147,6 +141,7 @@ categories.addEventListener('click', (event) => {
     text.classList.toggle('sr-only', !active);
   }
   renderPosition();
+  updateDraft();
   const scroller = categories.parentElement;
   const left = selected.offsetLeft - scroller.clientWidth / 2 + selected.clientWidth / 2;
   scroller.scrollTo({ left, behavior: 'smooth' });
@@ -169,18 +164,20 @@ composer.addEventListener('submit', (event) => {
   }
   addMessage(text, true);
   applyTextIntent(text);
-  activePrompt = addMessage(`got it. ${describeVibe().toLowerCase()} drag the map to fine-tune it.`, false);
-  lastPromptZone = '';
+  addMessage(`got it. ${describeVibe().toLowerCase()} drag the map to fine-tune it.`, false);
+  lastDraftZone = '';
   promptField.value = '';
   promptField.style.height = '';
   promptField.blur();
   thread.scrollTo({ top: thread.scrollHeight, behavior: 'smooth' });
 });
 
-promptField.addEventListener('input', () => {
+function resizeComposer() {
   promptField.style.height = 'auto';
   promptField.style.height = `${Math.min(promptField.scrollHeight, 140)}px`;
-});
+}
+
+promptField.addEventListener('input', resizeComposer);
 
 renderPosition();
 if (thread.scrollHeight > thread.clientHeight) thread.scrollTop = thread.scrollHeight;
