@@ -8,12 +8,13 @@
 
 * { box-sizing: border-box; }
 
-html { min-width: 320px; }
+html { min-width: 320px; height: 100%; overflow: hidden; }
 
 body {
   min-width: 320px;
+  height: 100%;
   margin: 0;
-  overscroll-behavior-x: none;
+  overflow: hidden;
 }
 
 button, textarea { font: inherit; }
@@ -30,16 +31,30 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .app {
+  position: fixed;
+  top: var(--app-top, 0px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
   width: min(100%, 402px);
-  min-height: 100svh;
+  height: var(--app-height, 100dvh);
   margin-inline: auto;
   padding-top: max(12px, env(safe-area-inset-top));
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
   overflow: hidden;
   background: #f4f3f5;
 }
 
-.thread { padding: 0 8px 0 14px; }
+.thread {
+  flex: 1;
+  min-height: 0;
+  padding: 0 8px 12px 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.thread::-webkit-scrollbar { display: none; }
 
 .message {
   position: relative;
@@ -107,7 +122,9 @@ button { -webkit-tap-highlight-color: transparent; }
 .instruction-message { max-width: 287px; margin-top: 15px; padding-block: 9px 10px; }
 
 .explorer {
+  flex: none;
   padding: 25px 0 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
   background: radial-gradient(ellipse 80% 65% at 12% 45%, rgba(214, 184, 255, .45), transparent 70%),
               radial-gradient(ellipse 80% 55% at 85% 40%, rgba(255, 203, 166, .42), transparent 70%);
 }
@@ -204,7 +221,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .vibe-map {
   position: relative;
   width: 100%;
-  height: 292px;
+  height: clamp(150px, calc(var(--app-height, 100dvh) - 510px), 292px);
   overflow: hidden;
   isolation: isolate;
   border: 1px solid rgba(255, 255, 255, .65);
@@ -291,7 +308,7 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 370px) {
   .message { font-size: 14px; }
   .choice-answer { white-space: normal; }
-  .vibe-map { height: 276px; }
+  .vibe-map { height: clamp(150px, calc(var(--app-height, 100dvh) - 525px), 276px); }
   .map-wrap { padding-inline: 13px; }
 }
 
