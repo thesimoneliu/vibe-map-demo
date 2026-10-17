@@ -9,10 +9,15 @@
     <meta name="description" content="A playful, touch-friendly map for finding tonight's vibe." />
     <title>Karpo — Your Vibe</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="variants.css" />
     <script src="app.js" defer></script>
+    <script src="variants.js" defer></script>
   </head>
   <body>
     <main class="app">
+      <button class="mode-button" id="mode-toggle" type="button" aria-label="Choose an experience" aria-controls="mode-menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <section class="thread" id="thread" aria-label="Conversation with Karpo">
         <div class="message message--outgoing location-message">Los Angeles</div>
         <div class="message message--incoming loading-message">pulling up Los Angeles...</div>
@@ -87,6 +92,15 @@
           <p class="map-description" id="map-description" aria-live="polite">A little buzz, mostly your own company.</p>
         </div>
       </section>
+      <section class="variant-stage" id="variant-stage" hidden aria-live="polite"></section>
+      <section class="variant-dock" id="variant-dock" hidden></section>
+      <div class="mode-menu" id="mode-menu" hidden>
+        <button class="mode-menu-backdrop" id="mode-backdrop" type="button" aria-label="Close menu"></button>
+        <nav class="mode-menu-panel" aria-label="Experience versions">
+          <div class="menu-heading"><div><span>THE PLAYGROUND</span><h2>Choose a version</h2></div><button id="mode-close" type="button" aria-label="Close menu">×</button></div>
+          <div id="mode-list"></div>
+        </nav>
+      </div>
     </main>
   </body>
 </html>
